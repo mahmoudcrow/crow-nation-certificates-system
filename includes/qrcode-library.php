@@ -46,11 +46,21 @@ class QRCode
 // دالة مساعدة للاستخدام السريع
 function crow_generate_qr_code($text, $size = 200)
 {
-    return QRCode::generateURL($text, $size);
+    $url = QRCode::generateURL($text, $size);
+    // Log for debugging
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Crow QR Generated: ' . $url);
+    }
+    return $url;
 }
 
 // دالة مساعدة مع Fallback
 function crow_generate_qr_code_safe($text, $size = 200)
 {
-    return QRCode::generateWithFallback($text, $size);
+    $url = QRCode::generateWithFallback($text, $size);
+    // Log for debugging
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Crow QR Generated (Safe): ' . $url);
+    }
+    return $url;
 }

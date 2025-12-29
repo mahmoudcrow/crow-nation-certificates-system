@@ -44,19 +44,33 @@ function crow_settings_page_html()
     <div class="wrap">
         <h1>⚙️ إعدادات نظام التحقق من الشهادات</h1>
 
-        <!-- GitHub Update Status Section -->
-        <div
-            style="background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #00A8D8; margin-bottom: 30px;">
-            <h3 style="margin-top: 0; color: #00A8D8;">📦 حالة التحديثات من GitHub</h3>
-            <div id="crow-update-status" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
-                <p style="color: #666; margin: 5px 0;">⏳ جاري الفحص...</p>
+        <!-- QR Code & GitHub Status Section -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <!-- QR Code Test -->
+            <div style="background: #f0fff4; padding: 20px; border-radius: 8px; border-left: 4px solid #1BC47D;">
+                <h3 style="margin-top: 0; color: #1BC47D;">🎯 اختبار توليد QR Code</h3>
+                <div id="crow-qr-test" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
+                    <p style="color: #666; margin: 5px 0;">⏳ جاري الاختبار...</p>
+                </div>
+                <button type="button" id="crow-test-qr-btn" class="button button-primary">
+                    🔄 اختبار QR Code
+                </button>
             </div>
-            <button type="button" id="crow-check-updates-btn" class="button button-primary">
-                🔄 فحص التحديثات الآن
-            </button>
-            <button type="button" id="crow-clear-cache-btn" class="button button-secondary" style="margin-right: 10px;">
-                🗑️ مسح الكاش
-            </button>
+
+            <!-- GitHub Update Status -->
+            <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #00A8D8;">
+                <h3 style="margin-top: 0; color: #00A8D8;">📦 حالة التحديثات من GitHub</h3>
+                <div id="crow-update-status"
+                    style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
+                    <p style="color: #666; margin: 5px 0;">⏳ جاري الفحص...</p>
+                </div>
+                <button type="button" id="crow-check-updates-btn" class="button button-primary">
+                    🔄 فحص التحديثات الآن
+                </button>
+                <button type="button" id="crow-clear-cache-btn" class="button button-secondary" style="margin-right: 10px;">
+                    🗑️ مسح الكاش
+                </button>
+            </div>
         </div>
 
         <!-- Preview Section -->
@@ -246,6 +260,17 @@ function crow_settings_page_html()
                 checkUpdates();
             });
 
+            // Test QR Code button
+            const testQrBtn = document.getElementById('crow-test-qr-btn');
+            if (testQrBtn) {
+                testQrBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    testQrBtn.disabled = true;
+                    testQrBtn.textContent = '⏳ جاري الاختبار...';
+                    testQRCode();
+                });
+            }
+
             // Check for updates button
             const checkBtn = document.getElementById('crow-check-updates-btn');
             if (checkBtn) {
@@ -277,6 +302,31 @@ function crow_settings_page_html()
                 });
             }
 
+            // Test QR Code
+            function testQRCode() {
+                const testDiv = document.getElementById('crow-qr-test');
+                const testUrl = 'https://example.com/?cert=TEST123';
+                const qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=' + encodeURIComponent(testUrl);
+
+                let html = '<div style="border-radius: 6px; padding: 15px; background: #1BC47D20; border-left: 3px solid #1BC47D;">';
+                html += '<p style="margin: 0; color: #333; font-weight: bold;">✅ QR Code جاهز!</p>';
+                html += '<p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">تم توليد الـ QR code بنجاح</p>';
+                html += '<p style="margin: 8px 0 0 0; color: #666; font-size: 13px;">الـ URL: <code>' + testUrl + '</code></p>';
+                html += '<div style="margin-top: 15px;">';
+                html += '<img src="' + qrUrl + '" alt="Test QR" style="width: 150px; height: 150px; border-radius: 4px; border: 1px solid #ddd;">';
+                html += '</div>';
+                html += '</div>';
+
+                testDiv.innerHTML = html;
+
+                const testBtn = document.getElementById('crow-test-qr-btn');
+                if (testBtn) {
+                    testBtn.disabled = false;
+                    testBtn.textContent = '🔄 اختبار QR Code';
+                }
+            }
+
+            // Check for updates
             function checkUpdates() {
                 const statusDiv = document.getElementById('crow-update-status');
                 fetch('<?php echo admin_url('admin-ajax.php'); ?>', {

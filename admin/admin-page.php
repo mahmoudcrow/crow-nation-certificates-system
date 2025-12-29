@@ -68,7 +68,10 @@ function crow_admin_page_html()
 
         /* ---- QR CODE AUTO GENERATION ---- */
         $verify_url = home_url('/?crow_verify=' . urlencode($data['serial']));
-        $qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=' . urlencode($verify_url);
+        // استخدم الـ safe function للـ fallback
+        $qr_url = function_exists('crow_generate_qr_code_safe')
+            ? crow_generate_qr_code_safe($verify_url, 200)
+            : crow_generate_qr_code($verify_url, 200);
         $data['qr_code_url'] = $qr_url;
 
         /* ---- IMAGE UPLOAD ---- */
@@ -191,8 +194,8 @@ function crow_admin_page_html()
                             word-break: break-all;
                             display: block;
                             margin-bottom: 15px;">
-                            [crow_certificate_checker]
-                        </code>
+                                [crow_certificate_checker]
+                            </code>
                 <button type="button" onclick="copyToClipboard('[crow_certificate_checker]')" style="background: white; 
                                color: #0099CC; 
                                border: none; 
@@ -424,8 +427,8 @@ function crow_admin_page_html()
                                     <td style="padding: 12px; text-align: center; font-weight: bold;"><?= $cert->id ?></td>
                                     <td style="padding: 12px;">
                                         <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
-                                                                    <?= esc_html($cert->serial) ?>
-                                                                </code>
+                                                                                <?= esc_html($cert->serial) ?>
+                                                                            </code>
                                     </td>
                                     <td style="padding: 12px;"><?= esc_html($cert->name) ?></td>
                                     <td

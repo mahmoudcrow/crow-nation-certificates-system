@@ -50,7 +50,12 @@ function crow_api_verify_certificate($request)
 add_action('wp_ajax_crow_check_updates', 'crow_ajax_check_updates');
 function crow_ajax_check_updates()
 {
-    check_ajax_referer('crow_check_updates', 'nonce');
+    // Verify nonce - try both with and without parameter name for compatibility
+    $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : '';
+
+    if (!$nonce || !wp_verify_nonce($nonce, 'crow_check_updates')) {
+        wp_send_json_error(['message' => 'Security check failed']);
+    }
 
     if (!current_user_can('manage_options')) {
         wp_send_json_error(['message' => 'Permission denied']);
@@ -82,7 +87,12 @@ function crow_ajax_check_updates()
 add_action('wp_ajax_crow_clear_update_cache', 'crow_ajax_clear_update_cache');
 function crow_ajax_clear_update_cache()
 {
-    check_ajax_referer('crow_clear_cache', 'nonce');
+    // Verify nonce
+    $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : '';
+
+    if (!$nonce || !wp_verify_nonce($nonce, 'crow_clear_cache')) {
+        wp_send_json_error(['message' => 'Security check failed']);
+    }
 
     if (!current_user_can('manage_options')) {
         wp_send_json_error(['message' => 'Permission denied']);
