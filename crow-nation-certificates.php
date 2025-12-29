@@ -23,10 +23,11 @@ require_once plugin_dir_path(__FILE__) . 'public/shortcode-display-new.php';
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
 require_once plugin_dir_path(__FILE__) . 'includes/github-updater.php';
 
+// تهيئة GitHub Updater - تأكد من تعديل البيانات:
 new Crow_GitHub_Updater(
     __FILE__,
-    'mahmoudcrow',
-    'YOUR_REPO_NAME'
+    'mahmoudcrow',              // ✏️ عدّل: ضع اسم حسابك على GitHub
+    'crow-nation-certificates-system'   // ✏️ عدّل: ضع اسم الريبو على GitHub
 );
 
 register_activation_hook(__FILE__, 'crow_create_certificates_table');
