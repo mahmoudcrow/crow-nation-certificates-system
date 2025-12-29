@@ -45,7 +45,8 @@ function crow_admin_assets_enqueue($hook)
 add_action('admin_enqueue_scripts', 'crow_admin_assets_enqueue');
 
 // تهيئة GitHub Updater - تأكد من تعديل البيانات:
-new Crow_GitHub_Updater(
+global $crow_updater_instance;
+$crow_updater_instance = new Crow_GitHub_Updater(
     __FILE__,
     'mahmoudcrow',              // ✏️ عدّل: ضع اسم حسابك على GitHub
     'crow-nation-certificates-system'   // ✏️ عدّل: ضع اسم الريبو على GitHub

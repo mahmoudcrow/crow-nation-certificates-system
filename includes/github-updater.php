@@ -74,24 +74,38 @@ class Crow_GitHub_Updater
                 'timeout' => 10,
                 'headers' => [
                     'User-Agent' => 'WordPress/' . get_bloginfo('version')
-                ]
+                ],
+                'sslverify' => apply_filters('https_local_ssl_verify', false)
             ]
         );
 
         if (is_wp_error($remote_response)) {
-            // في حالة الخطأ، أرجع الـ transient كما هي
+            error_log('Crow Updater Error: ' . $remote_response->get_error_message());
+            update_option('crow_last_update_error', $remote_response->get_error_message());
             return $transient;
         }
 
-        $data = json_decode(wp_remote_retrieve_body($remote_response), true);
+        $body = wp_remote_retrieve_body($remote_response);
+        $data = json_decode($body, true);
 
         if (!isset($data['tag_name'])) {
+            error_log('Crow Updater: No tag_name in response. Data: ' . print_r($data, true));
+            update_option('crow_last_update_error', 'No tag_name found in GitHub response');
             set_transient($this->cache_key, $transient, $this->cache_time);
             return $transient;
         }
 
         $new_version = $this->normalize_version($data['tag_name']);
         $current_version = $this->get_current_version();
+
+        // سجل معلومات الفحص
+        update_option('crow_last_update_check', [
+            'time' => current_time('mysql'),
+            'current' => $current_version,
+            'remote' => $new_version,
+            'url' => $this->github_api,
+            'comparison' => version_compare($current_version, $new_version, '<') ? 'update_available' : 'up_to_date'
+        ]);
 
         // إذا كانت نسخة جديدة متاحة
         if (version_compare($current_version, $new_version, '<')) {
@@ -174,6 +188,56 @@ class Crow_GitHub_Updater
     {
         $plugin_data = get_plugin_data($this->plugin_file);
         return $plugin_data['Version'] ?? '1.0';
+    }
+
+    /**
+     * دالة عامة للفحص اليدوي والحصول على معلومات التحديث
+     */
+    public function get_update_info()
+    {
+        $remote_response = wp_remote_get(
+            $this->github_api,
+            [
+                'timeout' => 10,
+                'headers' => [
+                    'User-Agent' => 'WordPress/' . get_bloginfo('version')
+                ],
+                'sslverify' => apply_filters('https_local_ssl_verify', false)
+            ]
+        );
+
+        if (is_wp_error($remote_response)) {
+            return [
+                'error' => true,
+                'message' => $remote_response->get_error_message()
+            ];
+        }
+
+        $data = json_decode(wp_remote_retrieve_body($remote_response), true);
+
+        if (!isset($data['tag_name'])) {
+            return [
+                'error' => true,
+                'message' => 'لم يتم العثور على إصدارات على GitHub'
+            ];
+        }
+
+        $new_version = $this->normalize_version($data['tag_name']);
+        $current_version = $this->get_current_version();
+        $has_update = version_compare($current_version, $new_version, '<');
+
+        return [
+            'error' => false,
+            'current_version' => $current_version,
+            'remote_version' => $new_version,
+            'has_update' => $has_update,
+            'github_url' => $data['html_url'],
+            'download_url' => $data['zipball_url'],
+            'api_url' => $this->github_api,
+            'github_repo' => $this->github_user . '/' . $this->github_repo,
+            'release_date' => $data['published_at'] ?? 'N/A',
+            'description' => $data['body'] ?? ''
+        ];
     }
 }
 ?>

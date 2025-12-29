@@ -44,6 +44,21 @@ function crow_settings_page_html()
     <div class="wrap">
         <h1>⚙️ إعدادات نظام التحقق من الشهادات</h1>
 
+        <!-- GitHub Update Status Section -->
+        <div
+            style="background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #00A8D8; margin-bottom: 30px;">
+            <h3 style="margin-top: 0; color: #00A8D8;">📦 حالة التحديثات من GitHub</h3>
+            <div id="crow-update-status" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
+                <p style="color: #666; margin: 5px 0;">⏳ جاري الفحص...</p>
+            </div>
+            <button type="button" id="crow-check-updates-btn" class="button button-primary">
+                🔄 فحص التحديثات الآن
+            </button>
+            <button type="button" id="crow-clear-cache-btn" class="button button-secondary" style="margin-right: 10px;">
+                🗑️ مسح الكاش
+            </button>
+        </div>
+
         <!-- Preview Section -->
         <div
             style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -221,6 +236,103 @@ function crow_settings_page_html()
             </p>
         </form>
     </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // Automatically check updates on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                checkUpdates();
+            });
+
+            // Check for updates button
+            const checkBtn = document.getElementById('crow-check-updates-btn');
+            if (checkBtn) {
+                checkBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    checkBtn.disabled = true;
+                    checkBtn.textContent = '⏳ جاري الفحص...';
+                    checkUpdates();
+                });
+            }
+
+            // Clear cache button
+            const clearBtn = document.getElementById('crow-clear-cache-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'action=crow_clear_update_cache&nonce=<?php echo wp_create_nonce("crow_clear_cache"); ?>'
+                    }).then(r => r.json()).then(r => {
+                        if (r.success) {
+                            alert('✅ تم مسح الكاش');
+                            checkUpdates();
+                        }
+                    });
+                });
+            }
+
+            function checkUpdates() {
+                const statusDiv = document.getElementById('crow-update-status');
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'action=crow_check_updates&nonce=<?php echo wp_create_nonce("crow_check_updates"); ?>'
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        let html = '';
+                        if (data.error) {
+                            html = '<p style="color: #DC3545;">❌ ' + data.message + '</p>';
+                        } else {
+                            const hasUpdate = data.has_update;
+                            const statusColor = hasUpdate ? '#FFC107' : '#1BC47D';
+                            const statusEmoji = hasUpdate ? '⚠️' : '✅';
+                            const statusText = hasUpdate ? 'يوجد تحديث جديد متاح' : 'الإضافة محدثة';
+
+                            html = '<div style="border-radius: 6px; padding: 15px; background: ' + statusColor + '20; border-left: 3px solid ' + statusColor + ';">';
+                            html += '<p style="margin: 0; color: #333; font-weight: bold;">' + statusEmoji + ' ' + statusText + '</p>';
+                            html += '<p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">';
+                            html += 'الإصدار الحالي: <strong>' + data.current_version + '</strong> | ';
+                            html += 'الإصدار البعيد: <strong>' + data.remote_version + '</strong>';
+                            html += '</p>';
+                            if (data.release_date) {
+                                html += '<p style="margin: 5px 0 0 0; color: #666; font-size: 13px;">تاريخ الإصدار: ' + data.release_date.split('T')[0] + '</p>';
+                            }
+                            if (data.description && data.description.length > 0) {
+                                html += '<p style="margin: 10px 0 0 0; color: #666; font-size: 13px; font-style: italic;">📝 ' + data.description.substring(0, 100) + '...</p>';
+                            }
+                            if (hasUpdate) {
+                                html += '<a href="' + data.github_url + '" target="_blank" class="button button-primary" style="margin-top: 10px;">شاهد الإصدار الجديد</a>';
+                            }
+                            html += '</div>';
+                        }
+                        statusDiv.innerHTML = html;
+
+                        const checkBtn = document.getElementById('crow-check-updates-btn');
+                        if (checkBtn) {
+                            checkBtn.disabled = false;
+                            checkBtn.textContent = '🔄 فحص التحديثات الآن';
+                        }
+                    })
+                    .catch(err => {
+                        statusDiv.innerHTML = '<p style="color: #DC3545;">❌ خطأ في الاتصال: ' + err.message + '</p>';
+                        const checkBtn = document.getElementById('crow-check-updates-btn');
+                        if (checkBtn) {
+                            checkBtn.disabled = false;
+                            checkBtn.textContent = '🔄 فحص التحديثات الآن';
+                        }
+                    });
+            }
+        })();
+    </script>
 
     <?php
 }
