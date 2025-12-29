@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Crow Nation Certificates System
  * Description: Certificate verification system by Mahmoud Moustafa.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Mahmoud Moustafa
  * Text Domain: crow-certificates
  * Domain Path: /languages
@@ -11,10 +11,14 @@
 if (!defined('ABSPATH'))
     exit;
 
+// تحديد نسخة قاعدة البيانات
+define('CROW_DB_VERSION', '1.0.4');
+
 // تحميل الترجمات
 load_plugin_textdomain('crow-certificates', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
 require_once plugin_dir_path(__FILE__) . 'includes/create-table.php';
+require_once plugin_dir_path(__FILE__) . 'includes/database-migrations.php';
 require_once plugin_dir_path(__FILE__) . 'includes/certificate-functions.php';
 require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
 require_once plugin_dir_path(__FILE__) . 'admin/certificates-list.php';
@@ -30,7 +34,13 @@ new Crow_GitHub_Updater(
     'crow-nation-certificates-system'   // ✏️ عدّل: ضع اسم الريبو على GitHub
 );
 
-register_activation_hook(__FILE__, 'crow_create_certificates_table');
+register_activation_hook(__FILE__, function () {
+    crow_create_certificates_table();
+    crow_run_migrations();
+});
+
+// تشغيل الـ Migrations عند كل تحميل
+add_action('init', 'crow_run_migrations');
 
 add_action('admin_menu', 'crow_register_admin_page', 5);
 

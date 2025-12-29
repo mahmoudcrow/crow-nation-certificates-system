@@ -176,6 +176,48 @@ function crow_admin_page_html()
     <div class="wrap">
         <h1>🎓 إدارة شهادات Crow Nation</h1>
 
+        <!-- SHORTCODE DISPLAY -->
+        <div style="background: linear-gradient(135deg, #0099CC 0%, #00A8D8 100%); 
+                    color: white; 
+                    padding: 20px; 
+                    border-radius: 8px; 
+                    margin-bottom: 30px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h2 style="margin-top: 0; color: white;">📋 الشورتكود - انسخه والصقه في صفحتك</h2>
+            <div style="background: rgba(255,255,255,0.1); 
+                        padding: 15px; 
+                        border-radius: 6px; 
+                        border-left: 4px solid #fff;
+                        margin: 10px 0;">
+                <code style="font-size: 16px; 
+                            font-weight: bold; 
+                            color: #fff; 
+                            word-break: break-all;
+                            display: block;
+                            margin-bottom: 15px;">
+                    [crow_certificate_checker]
+                </code>
+                <button type="button" 
+                        onclick="copyToClipboard('[crow_certificate_checker]')"
+                        style="background: white; 
+                               color: #0099CC; 
+                               border: none; 
+                               padding: 10px 20px; 
+                               border-radius: 4px; 
+                               cursor: pointer; 
+                               font-weight: bold;
+                               font-size: 14px;
+                               transition: all 0.3s ease;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                    📋 نسخ الشورتكود
+                </button>
+            </div>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">
+                ✨ استخدم هذا الشورتكود في أي صفحة لإضافة نموذج البحث عن الشهادات
+            </p>
+        </div>
+
         <!-- EXPORT / IMPORT -->
         <div class="crow-search-box">
             <form method="post" style="display:flex; gap:12px; flex:1;">
@@ -319,6 +361,87 @@ function crow_admin_page_html()
         </table>
 
     </div>
+
+    <script>
+    function copyToClipboard(text) {
+        // استخدام Clipboard API الحديث
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function() {
+                showCopyNotification();
+            }).catch(function(err) {
+                // fallback للمتصفحات القديمة
+                fallbackCopyToClipboard(text);
+            });
+        } else {
+            fallbackCopyToClipboard(text);
+        }
+    }
+
+    function fallbackCopyToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showCopyNotification();
+        } catch (err) {
+            console.error('خطأ في النسخ:', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function showCopyNotification() {
+        var notification = document.createElement('div');
+        notification.innerHTML = '✅ تم نسخ الشورتكود بنجاح!';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1BC47D;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 4px;
+            font-weight: bold;
+            z-index: 9999;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s forwards;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        `;
+
+        var style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(notification);
+
+        setTimeout(function() {
+            notification.remove();
+        }, 3000);
+    }
+    </script>
 
     <?php
 }
