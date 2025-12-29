@@ -306,8 +306,8 @@ function crow_certificates_list_page()
                                 </td>
                                 <td>
                                     <code style="background:#f5f5f5; padding:4px 8px; border-radius:4px; color:#d63384;">
-                                                    <?php echo esc_html($cert->serial); ?>
-                                                </code>
+                                                                <?php echo esc_html($cert->serial); ?>
+                                                            </code>
                                 </td>
                                 <td><?php echo esc_html(substr($cert->title, 0, 30)); ?></td>
                                 <td>
@@ -366,15 +366,3 @@ function crow_certificates_list_page()
 
     <?php
 }
-
-// تسجيل الصفحة
-add_action('admin_menu', function () {
-    add_submenu_page(
-        'crow-certificates',
-        __('قائمة الشهادات', 'crow-certificates'),
-        __('📊 الشهادات', 'crow-certificates'),
-        'manage_options',
-        'crow-certificates-list',
-        'crow_certificates_list_page'
-    );
-});

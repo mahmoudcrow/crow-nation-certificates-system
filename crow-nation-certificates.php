@@ -31,7 +31,7 @@ new Crow_GitHub_Updater(
 
 register_activation_hook(__FILE__, 'crow_create_certificates_table');
 
-add_action('admin_menu', 'crow_register_admin_page');
+add_action('admin_menu', 'crow_register_admin_page', 5);
 
 function crow_register_admin_page(): void
 {
@@ -52,5 +52,15 @@ function crow_register_admin_page(): void
         'manage_options',
         'crow-certificates-analytics',
         'crow_analytics_page_html'
+    );
+
+    // تسجيل صفحة الشهادات
+    add_submenu_page(
+        'crow-certificates',
+        __('قائمة الشهادات', 'crow-certificates'),
+        __('📊 الشهادات', 'crow-certificates'),
+        'manage_options',
+        'crow-certificates-list',
+        'crow_certificates_list_page'
     );
 }
