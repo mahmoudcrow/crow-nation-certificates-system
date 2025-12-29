@@ -12,6 +12,7 @@ function crow_certificate_shortcode()
         </h2>
 
         <form method="post" class="crow-form">
+            <?php wp_nonce_field('crow_certificate_search', 'crow_search_nonce'); ?>
             <input type="text" name="crow_serial" placeholder="🎓 أدخل رقم الشهادة..." required autocomplete="off">
             <button type="submit" style="margin-top:8px;">
                 🔎 بحث عن الشهادة
@@ -20,6 +21,12 @@ function crow_certificate_shortcode()
 
         <?php
         if (!empty($_POST['crow_serial'])) {
+            // التحقق من الـ nonce
+            if (!isset($_POST['crow_search_nonce']) || !wp_verify_nonce($_POST['crow_search_nonce'], 'crow_certificate_search')) {
+                echo "<div class='crow-error'>❌ خطأ في الحماية. حاول مرة أخرى.</div>";
+                return;
+            }
+
             global $wpdb;
             $table = $wpdb->prefix . 'crow_certificates';
             $serial = sanitize_text_field($_POST['crow_serial']);

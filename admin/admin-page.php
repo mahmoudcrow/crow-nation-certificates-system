@@ -227,9 +227,9 @@ function crow_admin_page_html()
                     <th>الحالة</th>
                     <td>
                         <select name="status">
-                            <option value="active" <?= isset($edit_cert) && $edit_cert->status == 'active' ? 'selected' : '' ?>>Active</option>
-                            <option value="expired" <?= isset($edit_cert) && $edit_cert->status == 'expired' ? 'selected' : '' ?>>Expired</option>
-                            <option value="revoked" <?= isset($edit_cert) && $edit_cert->status == 'revoked' ? 'selected' : '' ?>>Revoked</option>
+                            <option value="active" <?= isset($edit_cert) && $edit_cert->status == 'active' ? 'selected' : '' ?>><?php _e('Active', 'crow-certificates'); ?></option>
+                            <option value="expired" <?= isset($edit_cert) && $edit_cert->status == 'expired' ? 'selected' : '' ?>><?php _e('Expired', 'crow-certificates'); ?></option>
+                            <option value="revoked" <?= isset($edit_cert) && $edit_cert->status == 'revoked' ? 'selected' : '' ?>><?php _e('Revoked', 'crow-certificates'); ?></option>
                         </select>
                     </td>
                 </tr>

@@ -4,15 +4,22 @@
  * Description: Certificate verification system by Mahmoud Moustafa.
  * Version: 1.0
  * Author: Mahmoud Moustafa
+ * Text Domain: crow-certificates
+ * Domain Path: /languages
  */
 
 if (!defined('ABSPATH'))
     exit;
 
+// تحميل الترجمات
+load_plugin_textdomain('crow-certificates', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+
 require_once plugin_dir_path(__FILE__) . 'includes/create-table.php';
 require_once plugin_dir_path(__FILE__) . 'includes/certificate-functions.php';
 require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
+require_once plugin_dir_path(__FILE__) . 'admin/certificates-list.php';
 require_once plugin_dir_path(__FILE__) . 'admin/analytics-page.php';
+require_once plugin_dir_path(__FILE__) . 'public/shortcode-display-new.php';
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
 require_once plugin_dir_path(__FILE__) . 'includes/github-updater.php';
 
@@ -23,8 +30,6 @@ new Crow_GitHub_Updater(
 );
 
 register_activation_hook(__FILE__, 'crow_create_certificates_table');
-
-add_shortcode('crow_certificate_checker', 'crow_certificate_shortcode');
 
 add_action('admin_menu', 'crow_register_admin_page');
 
