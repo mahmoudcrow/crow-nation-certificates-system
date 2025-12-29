@@ -17,7 +17,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/github-updater.php';
 
 new Crow_GitHub_Updater(
     __FILE__,
-    'YOUR_GITHUB_USERNAME',
+    'mahmoudcrow',
     'YOUR_REPO_NAME'
 );
 
