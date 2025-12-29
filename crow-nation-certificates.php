@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Crow Nation Certificates System
  * Description: Certificate verification system by Mahmoud Moustafa.
- * Version: 1.0
+ * Version: 1.0.3
  * Author: Mahmoud Moustafa
  * Text Domain: crow-certificates
  * Domain Path: /languages
