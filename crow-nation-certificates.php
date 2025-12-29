@@ -12,7 +12,7 @@ if (!defined('ABSPATH'))
     exit;
 
 // تحديد نسخة قاعدة البيانات
-define('CROW_DB_VERSION', '1.0.4');
+define('CROW_DB_VERSION', '1.0.7');
 
 // تحميل الترجمات
 load_plugin_textdomain('crow-certificates', false, dirname(plugin_basename(__FILE__)) . '/languages/');
