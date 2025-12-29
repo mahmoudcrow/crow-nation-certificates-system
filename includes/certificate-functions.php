@@ -165,7 +165,7 @@ function crow_export_certificates_csv()
 
     global $wpdb;
     $table = $wpdb->prefix . 'crow_certificates';
-    $rows = $wpdb->get_results("SELECT * FROM $table", ARRAY_A);
+    $rows = $wpdb->get_results("SELECT id, serial, name, title, reason, issue_date, expiry_date, status, certificate_image, qr_code_url FROM $table", ARRAY_A);
 
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename=crow-certificates-' . date('Y-m-d-H-i-s') . '.csv');
@@ -174,6 +174,8 @@ function crow_export_certificates_csv()
     fputcsv($output, ['ID', 'Serial', 'Name', 'Title', 'Reason', 'Issue Date', 'Expiry Date', 'Status', 'Image URL', 'QR Code URL']);
 
     foreach ($rows as $row) {
+        // Ensure proper escaping for CSV
+        $row['id'] = intval($row['id']);
         fputcsv($output, $row);
     }
 

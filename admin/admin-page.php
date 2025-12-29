@@ -116,7 +116,8 @@ function crow_admin_page_html()
             wp_die('الطلب غير آمن');
         }
 
-        $rows = $wpdb->get_results("SELECT * FROM $table", ARRAY_A);
+        // Select only relevant columns to avoid strange codes
+        $rows = $wpdb->get_results("SELECT id, serial, name, title, reason, issue_date, expiry_date, status, certificate_image, qr_code_url FROM $table", ARRAY_A);
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=crow-certificates-' . date('Y-m-d') . '.csv');
@@ -124,9 +125,11 @@ function crow_admin_page_html()
         $output = fopen('php://output', 'w');
 
         if (!empty($rows)) {
-            fputcsv($output, array_keys($rows[0]));
-            foreach ($rows as $row)
+            fputcsv($output, ['ID', 'Serial', 'Name', 'Title', 'Reason', 'Issue Date', 'Expiry Date', 'Status', 'Image URL', 'QR Code URL']);
+            foreach ($rows as $row) {
+                $row['id'] = intval($row['id']);
                 fputcsv($output, $row);
+            }
         }
 
         fclose($output);
@@ -194,8 +197,8 @@ function crow_admin_page_html()
                             word-break: break-all;
                             display: block;
                             margin-bottom: 15px;">
-                                [crow_certificate_checker]
-                            </code>
+                                    [crow_certificate_checker]
+                                </code>
                 <button type="button" onclick="copyToClipboard('[crow_certificate_checker]')" style="background: white; 
                                color: #0099CC; 
                                border: none; 
@@ -427,8 +430,8 @@ function crow_admin_page_html()
                                     <td style="padding: 12px; text-align: center; font-weight: bold;"><?= $cert->id ?></td>
                                     <td style="padding: 12px;">
                                         <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
-                                                                                <?= esc_html($cert->serial) ?>
-                                                                            </code>
+                                                                                            <?= esc_html($cert->serial) ?>
+                                                                                        </code>
                                     </td>
                                     <td style="padding: 12px;"><?= esc_html($cert->name) ?></td>
                                     <td
