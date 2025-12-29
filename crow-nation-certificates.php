@@ -19,13 +19,30 @@ load_plugin_textdomain('crow-certificates', false, dirname(plugin_basename(__FIL
 
 require_once plugin_dir_path(__FILE__) . 'includes/create-table.php';
 require_once plugin_dir_path(__FILE__) . 'includes/database-migrations.php';
+require_once plugin_dir_path(__FILE__) . 'includes/qrcode-library.php';
 require_once plugin_dir_path(__FILE__) . 'includes/certificate-functions.php';
 require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
 require_once plugin_dir_path(__FILE__) . 'admin/certificates-list.php';
 require_once plugin_dir_path(__FILE__) . 'admin/analytics-page.php';
+require_once plugin_dir_path(__FILE__) . 'admin/settings-page.php';
 require_once plugin_dir_path(__FILE__) . 'public/shortcode-display-new.php';
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
 require_once plugin_dir_path(__FILE__) . 'includes/github-updater.php';
+
+/**
+ * Enqueue admin assets for plugin admin pages
+ */
+function crow_admin_assets_enqueue($hook)
+{
+    // only load on our plugin pages
+    if (strpos($hook, 'crow-certificates') === false) {
+        return;
+    }
+
+    wp_enqueue_style('crow-admin-style', plugin_dir_url(__FILE__) . 'assets/admin-style.css', [], '1.0.0');
+}
+
+add_action('admin_enqueue_scripts', 'crow_admin_assets_enqueue');
 
 // تهيئة GitHub Updater - تأكد من تعديل البيانات:
 new Crow_GitHub_Updater(
@@ -73,5 +90,15 @@ function crow_register_admin_page(): void
         'manage_options',
         'crow-certificates-list',
         'crow_certificates_list_page'
+    );
+
+    // تسجيل صفحة الإعدادات
+    add_submenu_page(
+        'crow-certificates',
+        __('الإعدادات', 'crow-certificates'),
+        __('⚙️ الإعدادات', 'crow-certificates'),
+        'manage_options',
+        'crow-certificates-settings',
+        'crow_settings_page_html'
     );
 }

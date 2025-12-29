@@ -1,0 +1,122 @@
+/* Admin styles for Crow Nation Certificates */
+.crow-admin-wrap {
+    --crow-primary: #00A8D8;
+    --crow-accent: #0099CC;
+    --crow-light: #f8f9fa;
+    --crow-success: #1BC47D;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.crow-admin-wrap .crow-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e6eef4;
+    margin-bottom: 24px;
+}
+
+.crow-admin-top {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.crow-admin-top .crow-card.shortcode {
+    flex: 1 1 60%;
+    background: linear-gradient(135deg, var(--crow-accent), var(--crow-primary));
+    color: #fff;
+}
+
+.crow-admin-top .crow-card.shortcode h2,
+.crow-admin-top .crow-card.shortcode p {
+    color: #fff;
+}
+
+.crow-admin-top .crow-preview {
+    flex: 1 1 38%;
+}
+
+.crow-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+    align-items: start;
+}
+
+.crow-form-card fieldset {
+    background: var(--crow-light) !important;
+    border: 1px solid #e6eef4 !important;
+    padding: 18px !important;
+    border-radius: 6px !important;
+}
+
+.crow-form-card legend {
+    color: var(--crow-accent) !important;
+    font-weight: 700 !important;
+}
+
+.crow-import,
+.crow-export {
+    display: block;
+    background: #fff;
+    padding: 14px;
+    border-radius: 6px;
+    border: 1px solid #e6eef4;
+}
+
+/* Search box */
+.crow-search-box input[type="text"] {
+    border: 1px solid #d6e9ef !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
+}
+
+.crow-search-box .button-primary {
+    background: var(--crow-accent) !important;
+    border-color: var(--crow-accent) !important;
+}
+
+/* Table */
+.crow-admin-wrap table.widefat thead tr {
+    background: #f4fbfe !important;
+    border-bottom: 2px solid var(--crow-accent) !important;
+}
+
+.crow-admin-wrap table.widefat tbody tr:hover {
+    background: #fbfdff !important;
+}
+
+/* Buttons */
+.crow-admin-wrap .button.button-primary {
+    background: var(--crow-accent) !important;
+    border-color: var(--crow-accent) !important;
+    color: #fff !important;
+}
+
+/* Small responsive adjustments */
+@media (max-width: 980px) {
+    .crow-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .crow-admin-top {
+        flex-direction: column;
+    }
+}
+
+/* Copy notification override (if needed) */
+.crow-copy-notice {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+/* Minor utilities */
+.crow-button-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

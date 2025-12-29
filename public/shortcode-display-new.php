@@ -9,6 +9,18 @@ function crow_certificate_shortcode()
     ob_start();
     wp_enqueue_style('crow-style', plugin_dir_url(__FILE__) . '../assets/style.css');
 
+    // الحصول على الألوان المحفوظة
+    $colors = [
+        'search_container_bg' => get_option('crow_search_container_bg', '#f8f9fa'),
+        'search_button_bg' => get_option('crow_search_button_bg', '#0099CC'),
+        'search_button_text' => get_option('crow_search_button_text', '#ffffff'),
+        'search_input_border' => get_option('crow_search_input_border', '#ddd'),
+        'header_bg' => get_option('crow_header_bg', '#0099CC'),
+        'header_text' => get_option('crow_header_text', '#ffffff'),
+        'success_bg' => get_option('crow_success_bg', '#1BC47D'),
+        'error_bg' => get_option('crow_error_bg', '#DC3545'),
+    ];
+
     // تحديد الوضع: البحث أو الإضافة
     $search_performed = !empty($_POST['crow_serial']) && wp_verify_nonce($_POST['crow_search_nonce'] ?? '', 'crow_certificate_search');
     $result = null;
@@ -20,34 +32,54 @@ function crow_certificate_shortcode()
         $result = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE serial=%s", $serial));
     }
 
+    // إضافة CSS ديناميكي للألوان
+    $custom_css = "
+        <style>
+            .crow-wrapper { --crow-header-bg: {$colors['header_bg']}; --crow-header-text: {$colors['header_text']}; --crow-search-container-bg: {$colors['search_container_bg']}; --crow-search-button-bg: {$colors['search_button_bg']}; --crow-search-button-text: {$colors['search_button_text']}; --crow-search-input-border: {$colors['search_input_border']}; --crow-success-bg: {$colors['success_bg']}; --crow-error-bg: {$colors['error_bg']}; }
+            .crow-header { background: var(--crow-header-bg) !important; color: var(--crow-header-text) !important; }
+            .crow-header h1 { color: var(--crow-header-text) !important; }
+            .crow-header p { color: var(--crow-header-text) !important; opacity: 0.9; }
+            .crow-search-container { background: var(--crow-search-container-bg) !important; }
+            .crow-search-button { background: var(--crow-search-button-bg) !important; color: var(--crow-search-button-text) !important; }
+            .crow-search-input { border-color: var(--crow-search-input-border) !important; }
+            .crow-success-banner { background: var(--crow-success-bg) !important; }
+            .crow-error-container { background: var(--crow-error-bg) !important; }
+        </style>
+    ";
+    echo $custom_css;
+
     ?>
     <div class="crow-wrapper">
         <!-- Logo/Header -->
-        <div class="crow-header">
+        <div class="crow-header"
+            style="background: <?= esc_attr($colors['header_bg']) ?>; color: <?= esc_attr($colors['header_text']) ?>;">
             <div class="crow-header-content">
-                <h1>🎓 <?php _e('Certificate Verification', 'crow-certificates'); ?></h1>
-                <p><?php _e('Verify your certificate by entering the serial number', 'crow-certificates'); ?></p>
+                <h1 style="color: <?= esc_attr($colors['header_text']) ?>;">🎓
+                    <?php _e('Certificate Verification', 'crow-certificates'); ?></h1>
+                <p style="color: <?= esc_attr($colors['header_text']) ?>;">يرجى إدخال رقم سيريال الشهادة للتحقق</p>
             </div>
         </div>
 
         <!-- Search Form -->
-        <div class="crow-search-container">
+        <div class="crow-search-container" style="background: <?= esc_attr($colors['search_container_bg']) ?>;">
             <form method="post" class="crow-search-form">
                 <?php wp_nonce_field('crow_certificate_search', 'crow_search_nonce'); ?>
 
                 <div class="crow-search-input-group">
-                    <input type="text" name="crow_serial" class="crow-search-input"
-                        placeholder="<?php esc_attr_e('Enter certificate serial number...', 'crow-certificates'); ?>"
-                        required autocomplete="off" autofocus>
-                    <button type="submit" class="crow-search-button">
+                    <input type="text" name="crow_serial" class="crow-search-input" placeholder="أدخل رقم السيريال..."
+                        required autocomplete="off" autofocus
+                        style="border-color: <?= esc_attr($colors['search_input_border']) ?>;">
+                    <button type="submit" class="crow-search-button"
+                        style="background: <?= esc_attr($colors['search_button_bg']) ?>; color: <?= esc_attr($colors['search_button_text']) ?>;">
                         <span class="icon">🔎</span>
-                        <span class="text"><?php _e('Verify', 'crow-certificates'); ?></span>
+                        <span class="text">بحث</span>
                     </button>
                 </div>
 
                 <?php if ($search_performed && empty($result)): ?>
-                    <div class="crow-search-hint">
-                        <?php _e('No results found. Please check the serial number and try again.', 'crow-certificates'); ?>
+                    <div class="crow-search-hint"
+                        style="background: <?= esc_attr($colors['error_bg']) ?>20; color: <?= esc_attr($colors['error_bg']) ?>;">
+                        ❌ لم يتم العثور على النتائج. يرجى التحقق من رقم السيريال
                     </div>
                 <?php endif; ?>
             </form>
@@ -57,7 +89,8 @@ function crow_certificate_shortcode()
         <?php if ($search_performed && $result): ?>
             <div class="crow-results-container">
                 <!-- Success Message -->
-                <div class="crow-success-banner">
+                <div class="crow-success-banner" style="background: <?= esc_attr($colors['success_bg']) ?>;">
+
                     <div class="banner-icon">✅</div>
                     <div class="banner-text">
                         <h2><?php _e('Certificate Verified', 'crow-certificates'); ?></h2>
@@ -97,17 +130,22 @@ function crow_certificate_shortcode()
                         <div class="crow-detail-item">
                             <div class="detail-label"><?php _e('Issue Date', 'crow-certificates'); ?></div>
                             <div class="detail-value">
-                                <?php echo esc_html(date_i18n('d F Y', strtotime($result->issue_date))); ?></div>
+                                <?php echo esc_html(date_i18n('d F Y', strtotime($result->issue_date))); ?>
+                            </div>
                         </div>
 
-                        <?php if (!empty($result->expiry_date)): ?>
-                            <div class="crow-detail-item">
-                                <div class="detail-label"><?php _e('Expiry Date', 'crow-certificates'); ?></div>
-                                <div class="detail-value">
-                                    <?php echo esc_html(date_i18n('d F Y', strtotime($result->expiry_date))); ?>
-                                </div>
+                        <div class="crow-detail-item">
+                            <div class="detail-label"><?php _e('Expiry Date', 'crow-certificates'); ?></div>
+                            <div class="detail-value">
+                                <?php
+                                if (!empty($result->expiry_date)) {
+                                    echo esc_html(date_i18n('d F Y', strtotime($result->expiry_date)));
+                                } else {
+                                    echo '<span style="color: #0099CC; font-weight: bold;">NO EXPIRING DATE</span>';
+                                }
+                                ?>
                             </div>
-                        <?php endif; ?>
+                        </div>
 
                         <div class="crow-detail-item">
                             <div class="detail-label"><?php _e('Status', 'crow-certificates'); ?></div>
