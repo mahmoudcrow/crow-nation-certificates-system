@@ -11,6 +11,7 @@ if (!defined('ABSPATH'))
 
 require_once plugin_dir_path(__FILE__) . 'includes/create-table.php';
 require_once plugin_dir_path(__FILE__) . 'includes/certificate-functions.php';
+require_once plugin_dir_path(__FILE__) . 'admin/admin-page.php';
 require_once plugin_dir_path(__FILE__) . 'admin/analytics-page.php';
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
 require_once plugin_dir_path(__FILE__) . 'includes/github-updater.php';
