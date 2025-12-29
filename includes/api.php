@@ -78,16 +78,17 @@ function crow_ajax_check_updates()
         );
     }
     $info = $crow_updater_instance->get_update_info();
-}
-// Debug logging
-if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('Crow Update Info: ' . print_r($info, true));
-}
 
-if (!empty($info['error'])) {
-    wp_send_json_error(['message' => $info['message'] ?? 'Unknown error occurred']);
-} else {
-    wp_send_json_success($info);
+    // Debug logging
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Crow Update Info: ' . print_r($info, true));
+    }
+
+    if (!empty($info['error'])) {
+        wp_send_json_error(['message' => $info['message'] ?? 'Unknown error occurred']);
+    } else {
+        wp_send_json_success($info);
+    }
 }
 
 // AJAX endpoint for clearing cache
