@@ -336,11 +336,27 @@ function crow_settings_page_html()
                     },
                     body: 'action=crow_check_updates&nonce=<?php echo wp_create_nonce("crow_check_updates"); ?>'
                 })
-                    .then(r => r.json())
+                    .then(r => {
+                        if (!r.ok) {
+                            throw new Error('HTTP error, status = ' + r.status);
+                        }
+                        return r.json();
+                    })
                     .then(response => {
                         let html = '';
                         // Check if we have data in success or error property
-                        const data = response.success ? response.data : response;
+                        let data = {};
+                        
+                        if (response.success === true && response.data) {
+                            data = response.data;
+                        } else if (response.success === false && response.data) {
+                            data = response.data;
+                        } else if (typeof response === 'object') {
+                            data = response;
+                        }
+                        
+                        console.log('Response:', response); // Debug
+                        console.log('Data:', data); // Debug
 
                         if (response.success === false || data.error) {
                             html = '<p style="color: #DC3545;">❌ ' + (data.message || 'خطأ في الفحص') + '</p>';

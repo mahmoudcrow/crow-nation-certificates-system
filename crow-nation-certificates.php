@@ -11,6 +11,11 @@
 if (!defined('ABSPATH'))
     exit;
 
+// تحديد مسار الإضافة الرئيسي
+define('CROW_PLUGIN_FILE', __FILE__);
+define('CROW_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('CROW_PLUGIN_URL', plugin_dir_url(__FILE__));
+
 // تحديد نسخة قاعدة البيانات
 define('CROW_DB_VERSION', '1.0.4');
 
