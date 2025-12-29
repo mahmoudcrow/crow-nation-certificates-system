@@ -287,10 +287,13 @@ function crow_settings_page_html()
                     body: 'action=crow_check_updates&nonce=<?php echo wp_create_nonce("crow_check_updates"); ?>'
                 })
                     .then(r => r.json())
-                    .then(data => {
+                    .then(response => {
                         let html = '';
-                        if (data.error) {
-                            html = '<p style="color: #DC3545;">❌ ' + data.message + '</p>';
+                        // Check if we have data in success or error property
+                        const data = response.success ? response.data : response;
+
+                        if (response.success === false || data.error) {
+                            html = '<p style="color: #DC3545;">❌ ' + (data.message || 'خطأ في الفحص') + '</p>';
                         } else {
                             const hasUpdate = data.has_update;
                             const statusColor = hasUpdate ? '#FFC107' : '#1BC47D';
@@ -300,8 +303,8 @@ function crow_settings_page_html()
                             html = '<div style="border-radius: 6px; padding: 15px; background: ' + statusColor + '20; border-left: 3px solid ' + statusColor + ';">';
                             html += '<p style="margin: 0; color: #333; font-weight: bold;">' + statusEmoji + ' ' + statusText + '</p>';
                             html += '<p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">';
-                            html += 'الإصدار الحالي: <strong>' + data.current_version + '</strong> | ';
-                            html += 'الإصدار البعيد: <strong>' + data.remote_version + '</strong>';
+                            html += 'الإصدار الحالي: <strong>' + (data.current_version || 'N/A') + '</strong> | ';
+                            html += 'الإصدار البعيد: <strong>' + (data.remote_version || 'N/A') + '</strong>';
                             html += '</p>';
                             if (data.release_date) {
                                 html += '<p style="margin: 5px 0 0 0; color: #666; font-size: 13px;">تاريخ الإصدار: ' + data.release_date.split('T')[0] + '</p>';
@@ -309,7 +312,7 @@ function crow_settings_page_html()
                             if (data.description && data.description.length > 0) {
                                 html += '<p style="margin: 10px 0 0 0; color: #666; font-size: 13px; font-style: italic;">📝 ' + data.description.substring(0, 100) + '...</p>';
                             }
-                            if (hasUpdate) {
+                            if (hasUpdate && data.github_url) {
                                 html += '<a href="' + data.github_url + '" target="_blank" class="button button-primary" style="margin-top: 10px;">شاهد الإصدار الجديد</a>';
                             }
                             html += '</div>';

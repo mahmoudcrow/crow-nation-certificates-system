@@ -191,8 +191,8 @@ function crow_admin_page_html()
                             word-break: break-all;
                             display: block;
                             margin-bottom: 15px;">
-                        [crow_certificate_checker]
-                    </code>
+                            [crow_certificate_checker]
+                        </code>
                 <button type="button" onclick="copyToClipboard('[crow_certificate_checker]')" style="background: white; 
                                color: #0099CC; 
                                border: none; 
@@ -245,240 +245,233 @@ function crow_admin_page_html()
             </div>
         </div>
 
-        <!-- Main grid: Add/Edit form + table -->
-        <div class="crow-grid">
+        <!-- ADD/EDIT FORM SECTION -->
+        <div class="crow-card crow-form-card"
+            style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 30px;">
+            <h2 style="margin-top: 0; color: #0099CC;"><?= $edit_cert ? "✏️ تعديل الشهادة" : "➕ إضافة شهادة جديدة" ?>
+            </h2>
 
-            <!-- ADD/EDIT FORM SECTION -->
-            <div class="crow-card crow-form-card"
-                style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 30px;">
-                <h2 style="margin-top: 0; color: #0099CC;"><?= $edit_cert ? "✏️ تعديل الشهادة" : "➕ إضافة شهادة جديدة" ?>
-                </h2>
+            <form method="post" enctype="multipart/form-data">
+                <?php wp_nonce_field('crow_certificate_action', 'crow_nonce'); ?>
+                <input type="hidden" name="cert_id" value="<?= esc_attr($edit_cert->id ?? '') ?>">
 
-                <form method="post" enctype="multipart/form-data">
-                    <?php wp_nonce_field('crow_certificate_action', 'crow_nonce'); ?>
-                    <input type="hidden" name="cert_id" value="<?= esc_attr($edit_cert->id ?? '') ?>">
+                <!-- معلومات أساسية -->
+                <fieldset
+                    style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
+                    <legend style="padding: 0 10px; font-weight: bold; color: #0099CC;">📝 معلومات أساسية</legend>
 
-                    <!-- معلومات أساسية -->
-                    <fieldset
-                        style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
-                        <legend style="padding: 0 10px; font-weight: bold; color: #0099CC;">📝 معلومات أساسية</legend>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    🔤 السيريال <span style="color: red;">*</span>
-                                </label>
-                                <input type="text" name="serial" value="<?= esc_attr($edit_cert->serial ?? '') ?>" required
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                            </div>
-
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    👤 اسم المتدرب <span style="color: red;">*</span>
-                                </label>
-                                <input type="text" name="name" value="<?= esc_attr($edit_cert->name ?? '') ?>" required
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                            </div>
-
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    ✉️ البريد الإلكتروني
-                                </label>
-                                <input type="email" name="email" value="<?= esc_attr($edit_cert->email ?? '') ?>"
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                            </div>
-
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    🎓 عنوان الشهادة <span style="color: red;">*</span>
-                                </label>
-                                <input type="text" name="title" value="<?= esc_attr($edit_cert->title ?? '') ?>" required
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                📌 السبب / البرنامج
+                                🔤 السيريال <span style="color: red;">*</span>
                             </label>
-                            <textarea name="reason"
-                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; min-height: 100px;"><?= esc_textarea($edit_cert->reason ?? '') ?></textarea>
-                        </div>
-                    </fieldset>
-
-                    <!-- التواريخ -->
-                    <fieldset
-                        style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
-                        <legend style="padding: 0 10px; font-weight: bold; color: #0099CC;">📅 التواريخ</legend>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    ✅ تاريخ الإصدار
-                                </label>
-                                <input type="date" name="issue_date" value="<?= esc_attr($edit_cert->issue_date ?? '') ?>"
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                            </div>
-
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    ⏰ تاريخ الانتهاء (اختياري)
-                                </label>
-                                <input type="date" name="expiry_date" value="<?= esc_attr($edit_cert->expiry_date ?? '') ?>"
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <!-- الحالة والصورة -->
-                    <fieldset
-                        style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
-                        <legend style="padding: 0 10px; font-weight: bold; color: #0099CC;">⚙️ الحالة والصورة</legend>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    🔔 حالة الشهادة
-                                </label>
-                                <select name="status"
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                                    <option value="active" <?= isset($edit_cert) && $edit_cert->status == 'active' ? 'selected' : '' ?>>✅ نشطة</option>
-                                    <option value="expired" <?= isset($edit_cert) && $edit_cert->status == 'expired' ? 'selected' : '' ?>>⏰ منتهية</option>
-                                    <option value="revoked" <?= isset($edit_cert) && $edit_cert->status == 'revoked' ? 'selected' : '' ?>>❌ ملغاة</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
-                                    🖼️ صورة الشهادة
-                                </label>
-                                <input type="file" name="certificate_image" accept="image/*"
-                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                            </div>
+                            <input type="text" name="serial" value="<?= esc_attr($edit_cert->serial ?? '') ?>" required
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
                         </div>
 
-                        <?php if (!empty($edit_cert->certificate_image)): ?>
-                            <div style="margin-top: 15px;">
-                                <p style="margin: 5px 0; font-weight: bold;">صورة حالية:</p>
-                                <img src="<?= esc_url($edit_cert->certificate_image) ?>"
-                                    style="max-width: 250px; height: auto; border-radius: 6px; border: 1px solid #ddd;">
-                            </div>
-                        <?php endif; ?>
-                    </fieldset>
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                                👤 اسم المتدرب <span style="color: red;">*</span>
+                            </label>
+                            <input type="text" name="name" value="<?= esc_attr($edit_cert->name ?? '') ?>" required
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                        </div>
 
-                    <!-- زر الحفظ -->
-                    <div style="display: flex; gap: 10px; justify-content: center;">
-                        <button type="submit" name="crow_save_certificate" class="button button-primary"
-                            style="padding: 12px 30px; font-size: 16px; font-weight: bold; cursor: pointer; min-width: 200px;">
-                            <?= $edit_cert ? '✅ تحديث الشهادة' : '➕ إضافة الشهادة' ?>
-                        </button>
-                        <?php if ($edit_cert): ?>
-                            <a href="<?php echo admin_url('admin.php?page=crow-certificates'); ?>"
-                                class="button button-secondary"
-                                style="padding: 12px 30px; font-size: 16px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center;">
-                                ❌ إلغاء
-                            </a>
-                        <?php endif; ?>
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                                ✉️ البريد الإلكتروني
+                            </label>
+                            <input type="email" name="email" value="<?= esc_attr($edit_cert->email ?? '') ?>"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                                🎓 عنوان الشهادة <span style="color: red;">*</span>
+                            </label>
+                            <input type="text" name="title" value="<?= esc_attr($edit_cert->title ?? '') ?>" required
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                        </div>
                     </div>
-                </form>
-            </div>
 
-            <!-- جدول جميع الشهادات -->
-            <div class="crow-card crow-table-card"
-                style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #ddd; margin-top: 30px;">
-                <h2 style="margin-top: 0; color: #0099CC;">📊 جميع الشهادات</h2>
-
-                <form method="post" class="crow-search-box" style="margin-bottom: 20px;">
-                    <?php wp_nonce_field('crow_certificate_action', 'crow_nonce'); ?>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" name="crow_search" placeholder="🔍 ابحث عن سيريال أو اسم أو عنوان..."
-                            value="<?= isset($_POST['crow_search']) ? esc_attr($_POST['crow_search']) : '' ?>"
-                            style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                        <button type="submit" class="button button-primary" style="flex-shrink:0;">بحث</button>
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                            📌 السبب / البرنامج
+                        </label>
+                        <textarea name="reason"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; min-height: 100px;"><?= esc_textarea($edit_cert->reason ?? '') ?></textarea>
                     </div>
-                </form>
+                </fieldset>
 
-                <div style="overflow-x: auto;">
-                    <table class="widefat fixed striped" style="margin: 0;">
-                        <thead>
-                            <tr style="background: #f8f9fa; border-bottom: 2px solid #0099CC;">
-                                <th style="padding: 12px; text-align: center; color: #0099CC; font-weight: bold;">رقم</th>
-                                <th style="padding: 12px; color: #0099CC; font-weight: bold;">السيريال</th>
-                                <th style="padding: 12px; color: #0099CC; font-weight: bold;">الاسم</th>
-                                <th style="padding: 12px; color: #0099CC; font-weight: bold;">العنوان</th>
-                                <th style="padding: 12px; color: #0099CC; font-weight: bold;">تاريخ الإصدار</th>
-                                <th style="padding: 12px; color: #0099CC; font-weight: bold;">الحالة</th>
-                                <th style="padding: 12px; text-align: center; color: #0099CC; font-weight: bold;">QR</th>
-                                <th style="padding: 12px; text-align: center; color: #0099CC; font-weight: bold;">الإجراءات
-                                </th>
+                <!-- التواريخ -->
+                <fieldset
+                    style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
+                    <legend style="padding: 0 10px; font-weight: bold; color: #0099CC;">📅 التواريخ</legend>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                                ✅ تاريخ الإصدار
+                            </label>
+                            <input type="date" name="issue_date" value="<?= esc_attr($edit_cert->issue_date ?? '') ?>"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                                ⏰ تاريخ الانتهاء (اختياري)
+                            </label>
+                            <input type="date" name="expiry_date" value="<?= esc_attr($edit_cert->expiry_date ?? '') ?>"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- الحالة والصورة -->
+                <fieldset
+                    style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
+                    <legend style="padding: 0 10px; font-weight: bold; color: #0099CC;">⚙️ الحالة والصورة</legend>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                                🔔 حالة الشهادة
+                            </label>
+                            <select name="status"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                                <option value="active" <?= isset($edit_cert) && $edit_cert->status == 'active' ? 'selected' : '' ?>>✅ نشطة</option>
+                                <option value="expired" <?= isset($edit_cert) && $edit_cert->status == 'expired' ? 'selected' : '' ?>>⏰ منتهية</option>
+                                <option value="revoked" <?= isset($edit_cert) && $edit_cert->status == 'revoked' ? 'selected' : '' ?>>❌ ملغاة</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                                🖼️ صورة الشهادة
+                            </label>
+                            <input type="file" name="certificate_image" accept="image/*"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <?php if (!empty($edit_cert->certificate_image)): ?>
+                        <div style="margin-top: 15px;">
+                            <p style="margin: 5px 0; font-weight: bold;">صورة حالية:</p>
+                            <img src="<?= esc_url($edit_cert->certificate_image) ?>"
+                                style="max-width: 250px; height: auto; border-radius: 6px; border: 1px solid #ddd;">
+                        </div>
+                    <?php endif; ?>
+                </fieldset>
+
+                <!-- زر الحفظ -->
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button type="submit" name="crow_save_certificate" class="button button-primary"
+                        style="padding: 12px 30px; font-size: 16px; font-weight: bold; cursor: pointer; min-width: 200px;">
+                        <?= $edit_cert ? '✅ تحديث الشهادة' : '➕ إضافة الشهادة' ?>
+                    </button>
+                    <?php if ($edit_cert): ?>
+                        <a href="<?php echo admin_url('admin.php?page=crow-certificates'); ?>" class="button button-secondary"
+                            style="padding: 12px 30px; font-size: 16px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center;">
+                            ❌ إلغاء
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+
+        <!-- جدول جميع الشهادات -->
+        <div class="crow-card crow-table-card"
+            style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #ddd; margin-top: 30px;">
+            <h2 style="margin-top: 0; color: #0099CC;">📊 جميع الشهادات</h2>
+
+            <form method="post" class="crow-search-box" style="margin-bottom: 20px;">
+                <?php wp_nonce_field('crow_certificate_action', 'crow_nonce'); ?>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="crow_search" placeholder="🔍 ابحث عن سيريال أو اسم أو عنوان..."
+                        value="<?= isset($_POST['crow_search']) ? esc_attr($_POST['crow_search']) : '' ?>"
+                        style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <button type="submit" class="button button-primary" style="flex-shrink:0;">بحث</button>
+                </div>
+            </form>
+
+            <div style="overflow-x: auto;">
+                <table class="widefat fixed striped" style="margin: 0;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #0099CC;">
+                            <th style="padding: 12px; text-align: center; color: #0099CC; font-weight: bold;">رقم</th>
+                            <th style="padding: 12px; color: #0099CC; font-weight: bold;">السيريال</th>
+                            <th style="padding: 12px; color: #0099CC; font-weight: bold;">الاسم</th>
+                            <th style="padding: 12px; color: #0099CC; font-weight: bold;">العنوان</th>
+                            <th style="padding: 12px; color: #0099CC; font-weight: bold;">تاريخ الإصدار</th>
+                            <th style="padding: 12px; color: #0099CC; font-weight: bold;">الحالة</th>
+                            <th style="padding: 12px; text-align: center; color: #0099CC; font-weight: bold;">QR</th>
+                            <th style="padding: 12px; text-align: center; color: #0099CC; font-weight: bold;">الإجراءات
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php if (empty($certificates)): ?>
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 30px; color: #999;">
+                                    📭 لا توجد شهادات حالياً
+                                </td>
                             </tr>
-                        </thead>
+                        <?php else: ?>
+                            <?php foreach ($certificates as $cert): ?>
+                                <tr style="border-bottom: 1px solid #e0e0e0; transition: background 0.2s;"
+                                    onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
+                                    <td style="padding: 12px; text-align: center; font-weight: bold;"><?= $cert->id ?></td>
+                                    <td style="padding: 12px;">
+                                        <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
+                                                                    <?= esc_html($cert->serial) ?>
+                                                                </code>
+                                    </td>
+                                    <td style="padding: 12px;"><?= esc_html($cert->name) ?></td>
+                                    <td
+                                        style="padding: 12px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        <?= esc_html($cert->title) ?>
+                                    </td>
+                                    <td style="padding: 12px;"><?= esc_html(date_i18n('d/m/Y', strtotime($cert->issue_date))) ?>
+                                    </td>
+                                    <td style="padding: 12px;">
+                                        <?php
+                                        $status_badges = [
+                                            'active' => '<span style="background: #1BC47D; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">✅ نشطة</span>',
+                                            'expired' => '<span style="background: #FFC107; color: #333; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">⏰ منتهية</span>',
+                                            'revoked' => '<span style="background: #DC3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">❌ ملغاة</span>'
+                                        ];
+                                        echo $status_badges[$cert->status] ?? $cert->status;
+                                        ?>
+                                    </td>
+                                    <td style="padding: 12px; text-align: center;">
+                                        <?php if (!empty($cert->qr_code_url)): ?>
+                                            <a href="<?= esc_url($cert->qr_code_url) ?>" target="_blank" title="فتح QR Code">
+                                                <img src="<?= esc_url($cert->qr_code_url) ?>"
+                                                    style="width: 50px; height: 50px; cursor: pointer; border-radius: 4px;">
+                                            </a>
+                                        <?php else: ?>
+                                            <span style="color: #ccc;">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="padding: 12px; text-align: center;">
+                                        <div style="display: flex; gap: 5px; justify-content: center;">
+                                            <a href="<?php echo admin_url('admin.php?page=crow-certificates&action=edit&id=' . $cert->id); ?>"
+                                                class="button button-small" style="padding: 5px 10px; font-size: 12px;">✏️</a>
 
-                        <tbody>
-                            <?php if (empty($certificates)): ?>
-                                <tr>
-                                    <td colspan="8" style="text-align: center; padding: 30px; color: #999;">
-                                        📭 لا توجد شهادات حالياً
+                                            <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=crow-certificates&action=delete&id=' . $cert->id), 'crow_delete_' . $cert->id)); ?>"
+                                                class="button button-small button-danger"
+                                                onclick="return confirm('هل تريد حذف هذه الشهادة؟');"
+                                                style="padding: 5px 10px; font-size: 12px;">🗑️</a>
+                                        </div>
                                     </td>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($certificates as $cert): ?>
-                                    <tr style="border-bottom: 1px solid #e0e0e0; transition: background 0.2s;"
-                                        onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
-                                        <td style="padding: 12px; text-align: center; font-weight: bold;"><?= $cert->id ?></td>
-                                        <td style="padding: 12px;">
-                                            <code
-                                                style="background: #f0f0f0; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
-                                                        <?= esc_html($cert->serial) ?>
-                                                    </code>
-                                        </td>
-                                        <td style="padding: 12px;"><?= esc_html($cert->name) ?></td>
-                                        <td
-                                            style="padding: 12px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                            <?= esc_html($cert->title) ?>
-                                        </td>
-                                        <td style="padding: 12px;"><?= esc_html(date_i18n('d/m/Y', strtotime($cert->issue_date))) ?>
-                                        </td>
-                                        <td style="padding: 12px;">
-                                            <?php
-                                            $status_badges = [
-                                                'active' => '<span style="background: #1BC47D; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">✅ نشطة</span>',
-                                                'expired' => '<span style="background: #FFC107; color: #333; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">⏰ منتهية</span>',
-                                                'revoked' => '<span style="background: #DC3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">❌ ملغاة</span>'
-                                            ];
-                                            echo $status_badges[$cert->status] ?? $cert->status;
-                                            ?>
-                                        </td>
-                                        <td style="padding: 12px; text-align: center;">
-                                            <?php if (!empty($cert->qr_code_url)): ?>
-                                                <a href="<?= esc_url($cert->qr_code_url) ?>" target="_blank" title="فتح QR Code">
-                                                    <img src="<?= esc_url($cert->qr_code_url) ?>"
-                                                        style="width: 50px; height: 50px; cursor: pointer; border-radius: 4px;">
-                                                </a>
-                                            <?php else: ?>
-                                                <span style="color: #ccc;">-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td style="padding: 12px; text-align: center;">
-                                            <div style="display: flex; gap: 5px; justify-content: center;">
-                                                <a href="<?php echo admin_url('admin.php?page=crow-certificates&action=edit&id=' . $cert->id); ?>"
-                                                    class="button button-small" style="padding: 5px 10px; font-size: 12px;">✏️</a>
-
-                                                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=crow-certificates&action=delete&id=' . $cert->id), 'crow_delete_' . $cert->id)); ?>"
-                                                    class="button button-small button-danger"
-                                                    onclick="return confirm('هل تريد حذف هذه الشهادة؟');"
-                                                    style="padding: 5px 10px; font-size: 12px;">🗑️</a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
-
-        </div> <!-- .crow-grid -->
+        </div>
 
     </div>
 
