@@ -36,8 +36,8 @@ add_action('admin_menu', 'crow_register_admin_page', 5);
 function crow_register_admin_page(): void
 {
     add_menu_page(
-        'Crow Certificates',
-        'Certificates',
+        __('نظام إدارة الشهادات', 'crow-certificates'),
+        __('الشهادات', 'crow-certificates'),
         'manage_options',
         'crow-certificates',
         'crow_admin_page_html',
@@ -47,8 +47,8 @@ function crow_register_admin_page(): void
 
     add_submenu_page(
         'crow-certificates',
-        'Crow Analytics',
-        'Analytics',
+        __('التحليلات', 'crow-certificates'),
+        __('التحليلات', 'crow-certificates'),
         'manage_options',
         'crow-certificates-analytics',
         'crow_analytics_page_html'
@@ -58,7 +58,7 @@ function crow_register_admin_page(): void
     add_submenu_page(
         'crow-certificates',
         __('قائمة الشهادات', 'crow-certificates'),
-        __('📊 الشهادات', 'crow-certificates'),
+        __('📊 قائمة الشهادات', 'crow-certificates'),
         'manage_options',
         'crow-certificates-list',
         'crow_certificates_list_page'

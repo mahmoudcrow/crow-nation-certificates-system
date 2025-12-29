@@ -66,7 +66,7 @@ function crow_certificates_list_page()
     <div class="wrap">
         <h1>
             🎓 <?php _e('إدارة الشهادات', 'crow-certificates'); ?>
-            <a href="<?php echo admin_url('admin.php?page=crow-admin'); ?>" class="page-title-action">
+            <a href="<?php echo admin_url('admin.php?page=crow-certificates'); ?>" class="page-title-action">
                 ➕ <?php _e('إضافة شهادة جديدة', 'crow-certificates'); ?>
             </a>
         </h1>
@@ -306,8 +306,8 @@ function crow_certificates_list_page()
                                 </td>
                                 <td>
                                     <code style="background:#f5f5f5; padding:4px 8px; border-radius:4px; color:#d63384;">
-                                                                <?php echo esc_html($cert->serial); ?>
-                                                            </code>
+                                                                            <?php echo esc_html($cert->serial); ?>
+                                                                        </code>
                                 </td>
                                 <td><?php echo esc_html(substr($cert->title, 0, 30)); ?></td>
                                 <td>

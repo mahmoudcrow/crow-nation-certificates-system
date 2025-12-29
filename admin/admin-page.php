@@ -2,8 +2,9 @@
 
 function crow_admin_page_html()
 {
-    if (!current_user_can('manage_options'))
-        return;
+    if (!current_user_can('manage_options')) {
+        wp_die(__('ليس لديك صلاحيات كافية للوصول إلى هذه الصفحة', 'crow-certificates'));
+    }
 
     global $wpdb;
     $table = $wpdb->prefix . 'crow_certificates';
@@ -57,6 +58,7 @@ function crow_admin_page_html()
         $data = [
             'serial' => sanitize_text_field($_POST['serial']),
             'name' => sanitize_text_field($_POST['name']),
+            'email' => sanitize_email($_POST['email'] ?? ''),
             'title' => sanitize_text_field($_POST['title']),
             'reason' => sanitize_textarea_field($_POST['reason']),
             'issue_date' => sanitize_text_field($_POST['issue_date']),
@@ -71,7 +73,7 @@ function crow_admin_page_html()
 
         /* ---- IMAGE UPLOAD ---- */
         if (!empty($_FILES['certificate_image']['name'])) {
-            $cert_id = intval($_POST['cert_id']);
+            $cert_id = intval($_POST['cert_id'] ?? 0);
 
             // حذف الصورة القديمة إذا كانت موجودة
             if ($cert_id) {
@@ -92,12 +94,12 @@ function crow_admin_page_html()
 
         /* ---- UPDATE ---- */
         if (!empty($_POST['cert_id'])) {
-            $wpdb->update($table, $data, ['id' => intval($_POST['cert_id'])]);
+            $cert_id = intval($_POST['cert_id']);
+            $wpdb->update($table, $data, ['id' => $cert_id], null, ['%d']);
             echo '<div class="notice notice-success is-dismissible"><p>✅ تم تحديث الشهادة بنجاح</p></div>';
-            // إعادة تحميل الصفحة للتحديث
-            wp_safe_remote_post(admin_url('admin.php?page=crow-certificates'));
         }
         /* ---- INSERT ---- */ else {
+            $data['created_at'] = current_time('mysql');
             $wpdb->insert($table, $data);
             echo '<div class="notice notice-success is-dismissible"><p>✅ تم إضافة الشهادة بنجاح</p></div>';
         }
@@ -208,6 +210,10 @@ function crow_admin_page_html()
                     <td><input type="text" name="name" value="<?= esc_attr($edit_cert->name ?? '') ?>" required></td>
                 </tr>
                 <tr>
+                    <th>البريد الإلكتروني</th>
+                    <td><input type="email" name="email" value="<?= esc_attr($edit_cert->email ?? '') ?>"></td>
+                </tr>
+                <tr>
                     <th>عنوان الشهادة</th>
                     <td><input type="text" name="title" value="<?= esc_attr($edit_cert->title ?? '') ?>" required></td>
                 </tr>
@@ -227,9 +233,9 @@ function crow_admin_page_html()
                     <th>الحالة</th>
                     <td>
                         <select name="status">
-                            <option value="active" <?= isset($edit_cert) && $edit_cert->status == 'active' ? 'selected' : '' ?>><?php _e('Active', 'crow-certificates'); ?></option>
-                            <option value="expired" <?= isset($edit_cert) && $edit_cert->status == 'expired' ? 'selected' : '' ?>><?php _e('Expired', 'crow-certificates'); ?></option>
-                            <option value="revoked" <?= isset($edit_cert) && $edit_cert->status == 'revoked' ? 'selected' : '' ?>><?php _e('Revoked', 'crow-certificates'); ?></option>
+                            <option value="active" <?= isset($edit_cert) && $edit_cert->status == 'active' ? 'selected' : '' ?>>✅ نشط</option>
+                            <option value="expired" <?= isset($edit_cert) && $edit_cert->status == 'expired' ? 'selected' : '' ?>>⏰ منتهي</option>
+                            <option value="revoked" <?= isset($edit_cert) && $edit_cert->status == 'revoked' ? 'selected' : '' ?>>❌ ملغى</option>
                         </select>
                     </td>
                 </tr>
@@ -265,14 +271,14 @@ function crow_admin_page_html()
         <table class="widefat fixed striped">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Serial</th>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Issue Date</th>
-                    <th>Status</th>
+                    <th>رقم</th>
+                    <th>السيريال</th>
+                    <th>الاسم</th>
+                    <th>العنوان</th>
+                    <th>تاريخ الإصدار</th>
+                    <th>الحالة</th>
                     <th>QR</th>
-                    <th>Actions</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
 
@@ -280,14 +286,23 @@ function crow_admin_page_html()
                 <?php foreach ($certificates as $cert): ?>
                     <tr>
                         <td><?= $cert->id ?></td>
-                        <td><?= $cert->serial ?></td>
-                        <td><?= $cert->name ?></td>
-                        <td><?= $cert->title ?></td>
-                        <td><?= $cert->issue_date ?></td>
-                        <td><?= $cert->status ?></td>
+                        <td><code><?= esc_html($cert->serial) ?></code></td>
+                        <td><?= esc_html($cert->name) ?></td>
+                        <td><?= esc_html($cert->title) ?></td>
+                        <td><?= esc_html(date_i18n('d/m/Y', strtotime($cert->issue_date))) ?></td>
+                        <td>
+                            <?php 
+                            $status_badges = [
+                                'active' => '✅ نشط',
+                                'expired' => '⏰ منتهي',
+                                'revoked' => '❌ ملغى'
+                            ];
+                            echo $status_badges[$cert->status] ?? $cert->status;
+                            ?>
+                        </td>
                         <td>
                             <?php if (!empty($cert->qr_code_url)): ?>
-                                <img src="<?= esc_url($cert->qr_code_url) ?>" style="width:60px;">
+                                <img src="<?= esc_url($cert->qr_code_url) ?>" style="width:60px; cursor:pointer;" title="QR Code">
                             <?php endif; ?>
                         </td>
                         <td>
