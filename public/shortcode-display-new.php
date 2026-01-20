@@ -1,6 +1,6 @@
 <?php
 /**
- * Shortcode محسّن لعرض مربع البحث والنتائج
+ * Enhanced Shortcode for displaying search box and results
  * [crow_certificate_checker]
  */
 
@@ -9,7 +9,7 @@ function crow_certificate_shortcode()
     ob_start();
     wp_enqueue_style('crow-style', plugin_dir_url(__FILE__) . '../assets/style.css');
 
-    // الحصول على الألوان المحفوظة
+    // Get saved colors
     $colors = [
         'search_container_bg' => get_option('crow_search_container_bg', '#f8f9fa'),
         'search_button_bg' => get_option('crow_search_button_bg', '#0099CC'),
@@ -21,7 +21,7 @@ function crow_certificate_shortcode()
         'error_bg' => get_option('crow_error_bg', '#DC3545'),
     ];
 
-    // تحديد الوضع: البحث أو الإضافة
+    // Determine mode: Search or Add
     $search_performed = !empty($_POST['crow_serial']) && wp_verify_nonce($_POST['crow_search_nonce'] ?? '', 'crow_certificate_search');
     $result = null;
 
@@ -32,7 +32,7 @@ function crow_certificate_shortcode()
         $result = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE serial=%s", $serial));
     }
 
-    // إضافة CSS ديناميكي للألوان
+    // Add dynamic CSS for colors
     $custom_css = "
         <style>
             .crow-wrapper { --crow-header-bg: {$colors['header_bg']}; --crow-header-text: {$colors['header_text']}; --crow-search-container-bg: {$colors['search_container_bg']}; --crow-search-button-bg: {$colors['search_button_bg']}; --crow-search-button-text: {$colors['search_button_text']}; --crow-search-input-border: {$colors['search_input_border']}; --crow-success-bg: {$colors['success_bg']}; --crow-error-bg: {$colors['error_bg']}; }
@@ -55,8 +55,10 @@ function crow_certificate_shortcode()
             style="background: <?= esc_attr($colors['header_bg']) ?>; color: <?= esc_attr($colors['header_text']) ?>;">
             <div class="crow-header-content">
                 <h1 style="color: <?= esc_attr($colors['header_text']) ?>;">🎓
-                    <?php _e('Certificate Verification', 'crow-certificates'); ?></h1>
-                <p style="color: <?= esc_attr($colors['header_text']) ?>;">يرجى إدخال رقم سيريال الشهادة للتحقق</p>
+                    <?php _e('Certificate Verification', 'crow-certificates'); ?>
+                </h1>
+                <p style="color: <?= esc_attr($colors['header_text']) ?>;">Please enter the certificate serial number to
+                    verify</p>
             </div>
         </div>
 
@@ -66,20 +68,20 @@ function crow_certificate_shortcode()
                 <?php wp_nonce_field('crow_certificate_search', 'crow_search_nonce'); ?>
 
                 <div class="crow-search-input-group">
-                    <input type="text" name="crow_serial" class="crow-search-input" placeholder="أدخل رقم السيريال..."
+                    <input type="text" name="crow_serial" class="crow-search-input" placeholder="Enter serial number..."
                         required autocomplete="off" autofocus
                         style="border-color: <?= esc_attr($colors['search_input_border']) ?>;">
                     <button type="submit" class="crow-search-button"
                         style="background: <?= esc_attr($colors['search_button_bg']) ?>; color: <?= esc_attr($colors['search_button_text']) ?>;">
                         <span class="icon">🔎</span>
-                        <span class="text">بحث</span>
+                        <span class="text">Search</span>
                     </button>
                 </div>
 
                 <?php if ($search_performed && empty($result)): ?>
                     <div class="crow-search-hint"
                         style="background: <?= esc_attr($colors['error_bg']) ?>20; color: <?= esc_attr($colors['error_bg']) ?>;">
-                        ❌ لم يتم العثور على النتائج. يرجى التحقق من رقم السيريال
+                        ❌ No results found. Please check the serial number
                     </div>
                 <?php endif; ?>
             </form>
@@ -135,19 +137,6 @@ function crow_certificate_shortcode()
                         </div>
 
                         <div class="crow-detail-item">
-                            <div class="detail-label"><?php _e('Expiry Date', 'crow-certificates'); ?></div>
-                            <div class="detail-value">
-                                <?php
-                                if (!empty($result->expiry_date)) {
-                                    echo esc_html(date_i18n('d F Y', strtotime($result->expiry_date)));
-                                } else {
-                                    echo '<span style="color: #0099CC; font-weight: bold;">NO EXPIRING DATE</span>';
-                                }
-                                ?>
-                            </div>
-                        </div>
-
-                        <div class="crow-detail-item">
                             <div class="detail-label"><?php _e('Status', 'crow-certificates'); ?></div>
                             <div class="detail-value">
                                 <span class="status-badge status-<?php echo esc_attr($result->status); ?>">
@@ -188,7 +177,7 @@ function crow_certificate_shortcode()
                 <!-- Search Again Button -->
                 <div class="crow-actions">
                     <button class="crow-search-again-btn" onclick="location.reload()">
-                        🔄 <?php _e('Search Another Certificate', 'crow-certificates'); ?>
+                        🔄 Search Another Certificate
                     </button>
                 </div>
             </div>
@@ -202,7 +191,7 @@ function crow_certificate_shortcode()
                 </p>
 
                 <button class="crow-search-again-btn" onclick="location.reload()">
-                    🔄 <?php _e('Try Again', 'crow-certificates'); ?>
+                    🔄 Try Again
                 </button>
             </div>
         <?php endif; ?>
@@ -212,7 +201,7 @@ function crow_certificate_shortcode()
     return ob_get_clean();
 }
 
-// التسجيل المحسّن
+// Register the enhanced shortcode
 function crow_register_certificate_shortcode()
 {
     add_shortcode('crow_certificate_checker', 'crow_certificate_shortcode');

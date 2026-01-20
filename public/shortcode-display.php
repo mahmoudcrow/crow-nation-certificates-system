@@ -8,22 +8,22 @@ function crow_certificate_shortcode()
 
     <div class="crow-wrapper">
         <h2 style="color:#0099CC; margin-bottom:24px; font-size:24px; font-weight:700;">
-            🔍 التحقق من الشهادة
+            🔍 Certificate Verification
         </h2>
 
         <form method="post" class="crow-form">
             <?php wp_nonce_field('crow_certificate_search', 'crow_search_nonce'); ?>
-            <input type="text" name="crow_serial" placeholder="🎓 أدخل رقم الشهادة..." required autocomplete="off">
+            <input type="text" name="crow_serial" placeholder="🎓 Enter certificate number..." required autocomplete="off">
             <button type="submit" style="margin-top:8px;">
-                🔎 بحث عن الشهادة
+                🔎 Search for certificate
             </button>
         </form>
 
         <?php
         if (!empty($_POST['crow_serial'])) {
-            // التحقق من الـ nonce
+            // Verify the nonce
             if (!isset($_POST['crow_search_nonce']) || !wp_verify_nonce($_POST['crow_search_nonce'], 'crow_certificate_search')) {
-                echo "<div class='crow-error'>❌ خطأ في الحماية. حاول مرة أخرى.</div>";
+                echo "<div class='crow-error'>❌ Security error. Try again.</div>";
                 return;
             }
 
@@ -37,21 +37,17 @@ function crow_certificate_shortcode()
                 $status_class = 'status-' . esc_attr($cert->status);
                 echo "<div class='crow-success'>
                         <div style='display:flex; align-items:center; gap:12px; margin-bottom:16px;'>
-                            <h3 style='margin:0; font-size:22px;'>✅ الشهادة معتمدة</h3>
+                            <h3 style='margin:0; font-size:22px;'>✅ Certificate Verified</h3>
                             <span class='$status_class'>" . crow_get_status_badge_text($cert->status) . "</span>
                         </div>
                         
                         <div style='background:rgba(255,255,255,0.5); padding:16px; border-radius:6px; margin-bottom:16px;'>
-                            <p><strong>👤 الاسم:</strong> " . esc_html($cert->name) . "</p>
-                            <p><strong>🏆 العنوان:</strong> " . esc_html($cert->title) . "</p>
-                            <p><strong>📝 السبب/البرنامج:</strong> " . esc_html($cert->reason) . "</p>
-                            <p><strong>📅 تاريخ الإصدار:</strong> " . esc_html($cert->issue_date) . "</p>";
+                            <p><strong>👤 Name:</strong> " . esc_html($cert->name) . "</p>
+                            <p><strong>🏆 Title:</strong> " . esc_html($cert->title) . "</p>
+                            <p><strong>📝 Program/Course:</strong> " . esc_html($cert->reason) . "</p>
+                            <p><strong>📅 Issue Date:</strong> " . esc_html($cert->issue_date) . "</p>";
 
-                if (!empty($cert->expiry_date)) {
-                    echo "<p><strong>⏰ تاريخ الانتهاء:</strong> " . esc_html($cert->expiry_date) . "</p>";
-                }
-
-                echo "<p style='margin-bottom:0;'><strong>🔐 الحالة:</strong> <span class='$status_class'>" . crow_get_status_badge_text($cert->status) . "</span></p>
+                echo "<p style='margin-bottom:0;'><strong>🔐 Status:</strong> <span class='$status_class'>" . crow_get_status_badge_text($cert->status) . "</span></p>
                         </div>";
 
                 if (!empty($cert->certificate_image)) {
@@ -61,7 +57,7 @@ function crow_certificate_shortcode()
 
                 if (!empty($cert->qr_code_url)) {
                     echo "<div style='margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.3); text-align:center;'>
-                                    <p style='color:rgba(0,0,0,0.6); font-size:12px; margin-bottom:12px;'>رمز QR:</p>
+                                    <p style='color:rgba(0,0,0,0.6); font-size:12px; margin-bottom:12px;'>QR Code:</p>
                                     <img src='" . esc_url($cert->qr_code_url) . "' style='width:150px; height:150px;'>
                                   </div>";
                 }
@@ -69,8 +65,8 @@ function crow_certificate_shortcode()
                 echo "</div>";
             } else {
                 echo "<div class='crow-error' style='font-size:16px; padding:28px;'>
-                        <p style='margin:0;'>❌ عذراً، السيريال المدخل غير صحيح أو غير موجود</p>
-                        <p style='margin:12px 0 0 0; font-size:13px; opacity:0.8;'>يرجى التحقق من رقم الشهادة وحاول مجدداً</p>
+                        <p style='margin:0;'>❌ Sorry, the entered serial number is incorrect or does not exist</p>
+                        <p style='margin:12px 0 0 0; font-size:13px; opacity:0.8;'>Please verify the certificate number and try again</p>
                       </div>";
             }
         }
@@ -87,10 +83,10 @@ function crow_certificate_shortcode()
 function crow_get_status_badge_text($status)
 {
     $badges = [
-        'active' => '✅ نشط',
-        'expired' => '⏰ منتهي',
-        'revoked' => '❌ ملغى'
+        'active' => '✅ Active',
+        'expired' => '⏰ Expired',
+        'revoked' => '❌ Revoked'
     ];
 
-    return $badges[$status] ?? 'غير معروف';
+    return $badges[$status] ?? 'Unknown';
 }

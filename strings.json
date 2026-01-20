@@ -1,0 +1,46 @@
+{
+    "app": {
+        "name": "Crow Nation Certificates System",
+        "version": "1.0.7"
+    },
+    "search_page": {
+        "title": "Certificate Verification",
+        "description": "Please enter the certificate serial number to verify",
+        "placeholder": "Enter serial number...",
+        "button_search": "Search",
+        "button_search_another": "Search Another Certificate",
+        "button_try_again": "Try Again"
+    },
+    "results": {
+        "success": "Certificate Verified",
+        "success_message": "This certificate is valid and authentic",
+        "not_found": "Certificate Not Found",
+        "not_found_message": "The serial number you entered could not be found in our system",
+        "not_found_hint": "Please double-check the serial number and try again",
+        "no_results": "No results found. Please check the serial number"
+    },
+    "certificate_details": {
+        "title": "Certificate Details",
+        "holder_name": "Holder Name",
+        "certificate_title": "Certificate Title",
+        "program_course": "Program/Course",
+        "serial_number": "Serial Number",
+        "issue_date": "Issue Date",
+        "status": "Status"
+    },
+    "images": {
+        "certificate_image": "Certificate Image",
+        "qr_code": "QR Code",
+        "scan_to_verify": "Scan to verify online"
+    },
+    "status": {
+        "active": "Active",
+        "expired": "Expired",
+        "revoked": "Revoked",
+        "unknown": "Unknown"
+    },
+    "errors": {
+        "security_error": "Security error. Try again.",
+        "certificate_not_found": "Certificate not found!"
+    }
+}
