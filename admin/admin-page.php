@@ -98,7 +98,14 @@ function crow_admin_page_html()
         /* ---- UPDATE ---- */
         if (!empty($_POST['cert_id'])) {
             $cert_id = intval($_POST['cert_id']);
-            $wpdb->update($table, $data, ['id' => $cert_id], null, ['%d']);
+
+            // بناء array للـ formats
+            $formats = [];
+            foreach ($data as $key => $value) {
+                $formats[$key] = '%s';
+            }
+
+            $wpdb->update($table, $data, ['id' => $cert_id], $formats, ['%d']);
             echo '<div class="notice notice-success is-dismissible"><p>✅ تم تحديث الشهادة بنجاح</p></div>';
         }
         /* ---- INSERT ---- */ else {
@@ -197,8 +204,8 @@ function crow_admin_page_html()
                             word-break: break-all;
                             display: block;
                             margin-bottom: 15px;">
-                                    [crow_certificate_checker]
-                                </code>
+                                        [crow_certificate_checker]
+                                    </code>
                 <button type="button" onclick="copyToClipboard('[crow_certificate_checker]')" style="background: white; 
                                color: #0099CC; 
                                border: none; 
@@ -430,8 +437,8 @@ function crow_admin_page_html()
                                     <td style="padding: 12px; text-align: center; font-weight: bold;"><?= $cert->id ?></td>
                                     <td style="padding: 12px;">
                                         <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
-                                                                                            <?= esc_html($cert->serial) ?>
-                                                                                        </code>
+                                                                                                        <?= esc_html($cert->serial) ?>
+                                                                                                    </code>
                                     </td>
                                     <td style="padding: 12px;"><?= esc_html($cert->name) ?></td>
                                     <td

@@ -158,8 +158,11 @@ function crow_certificate_shortcode()
                         <?php if (!empty($result->certificate_image)): ?>
                             <div class="crow-image-container">
                                 <h3><?php _e('Certificate Image', 'crow-certificates'); ?></h3>
-                                <img src="<?php echo esc_url($result->certificate_image); ?>"
+                                <img src="<?php echo esc_url($result->certificate_image . '?v=' . filemtime(get_attached_file(attachment_url_to_postid($result->certificate_image)) ?: '') ?: time()); ?>"
                                     alt="<?php echo esc_attr($result->name); ?>" class="crow-certificate-image" loading="lazy">
+                                <a href="<?php echo esc_url($result->certificate_image); ?>" download class="crow-download-btn">
+                                    📥 Download Certificate
+                                </a>
                             </div>
                         <?php endif; ?>
 

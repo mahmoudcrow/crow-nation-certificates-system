@@ -51,8 +51,18 @@ function crow_certificate_shortcode()
                         </div>";
 
                 if (!empty($cert->certificate_image)) {
-                    echo "<img src='" . esc_url($cert->certificate_image) . "' 
-                                    style='max-width:100%; height:auto; margin-top:16px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.12);'>";
+                    $image_url = $cert->certificate_image;
+                    $attachment_id = attachment_url_to_postid($image_url);
+                    $cache_buster = $attachment_id ? filemtime(get_attached_file($attachment_id)) : time();
+                    $image_url_with_cache = $image_url . '?v=' . $cache_buster;
+
+                    echo "<img src='" . esc_url($image_url_with_cache) . "' 
+                                    style='max-width:100%; height:auto; margin-top:16px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.12);'>
+                            <div style='margin-top:12px; text-align:center;'>
+                                <a href='" . esc_url($cert->certificate_image) . "' download style='display:inline-block; background:#0099CC; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; font-weight:bold;'>
+                                    📥 Download Certificate
+                                </a>
+                            </div>";
                 }
 
                 if (!empty($cert->qr_code_url)) {

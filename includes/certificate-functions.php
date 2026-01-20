@@ -182,4 +182,27 @@ function crow_export_certificates_csv()
     fclose($output);
     exit;
 }
+
+/**
+ * Get certificate image URL with cache-busting parameter
+ * Prevents browser caching issues when image is updated
+ */
+function crow_get_certificate_image_url($image_url)
+{
+    if (empty($image_url)) {
+        return '';
+    }
+
+    $attachment_id = attachment_url_to_postid($image_url);
+    if ($attachment_id) {
+        $file_path = get_attached_file($attachment_id);
+        if ($file_path && file_exists($file_path)) {
+            $cache_buster = filemtime($file_path);
+            return $image_url . '?v=' . $cache_buster;
+        }
+    }
+
+    // Fallback: use current time as cache buster
+    return $image_url . '?v=' . time();
+}
 ?>
