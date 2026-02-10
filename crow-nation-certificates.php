@@ -31,6 +31,7 @@ require_once plugin_dir_path(__FILE__) . 'admin/certificates-list.php';
 require_once plugin_dir_path(__FILE__) . 'admin/analytics-page.php';
 require_once plugin_dir_path(__FILE__) . 'admin/settings-page.php';
 require_once plugin_dir_path(__FILE__) . 'public/shortcode-display-new.php';
+require_once plugin_dir_path(__FILE__) . 'public/shortcode-certificates-list.php';
 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
 require_once plugin_dir_path(__FILE__) . 'includes/github-updater.php';
 

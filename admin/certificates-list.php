@@ -199,25 +199,55 @@ function crow_certificates_list_page()
             }
 
             .pagination {
-                margin-top: 20px;
-                text-align: center;
+                margin-top: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                padding: 20px;
+                background: #f9f9f9;
+                border-radius: 8px;
+            }
+
+            .pagination-info {
+                font-size: 14px;
+                color: #666;
+                margin-right: 20px;
             }
 
             .pagination a,
             .pagination span {
                 display: inline-block;
-                padding: 8px 12px;
+                padding: 10px 14px;
                 margin: 0 2px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 text-decoration: none;
                 color: #0099CC;
+                font-weight: 500;
+                transition: all 0.3s;
+                background: white;
+            }
+
+            .pagination a:hover {
+                background: #0099CC;
+                color: white;
+                border-color: #0099CC;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 153, 204, 0.2);
             }
 
             .pagination .current {
                 background: #0099CC;
                 color: white;
                 border-color: #0099CC;
+                cursor: default;
+                pointer-events: none;
+            }
+
+            .pagination .prev-next {
+                font-weight: bold;
             }
 
             .empty-state {
@@ -306,8 +336,8 @@ function crow_certificates_list_page()
                                 </td>
                                 <td>
                                     <code style="background:#f5f5f5; padding:4px 8px; border-radius:4px; color:#d63384;">
-                                                                            <?php echo esc_html($cert->serial); ?>
-                                                                        </code>
+                                                                                        <?php echo esc_html($cert->serial); ?>
+                                                                                    </code>
                                 </td>
                                 <td><?php echo esc_html(substr($cert->title, 0, 30)); ?></td>
                                 <td>
@@ -344,20 +374,85 @@ function crow_certificates_list_page()
                 <!-- Pagination -->
                 <?php if ($total_pages > 1): ?>
                     <div class="pagination">
+                        <!-- Pagination Info -->
+                        <span class="pagination-info">
+                            <?php
+                            $start = ($paged - 1) * $per_page + 1;
+                            $end = min($paged * $per_page, $total);
+                            printf(
+                                __('الصفحة %d من %d | عرض %d - %d من %d', 'crow-certificates'),
+                                $paged,
+                                $total_pages,
+                                $start,
+                                $end,
+                                $total
+                            );
+                            ?>
+                        </span>
+
+                        <!-- Previous Button -->
+                        <?php if ($paged > 1): ?>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=crow-certificates-list&paged=1' . (!empty($search) ? '&s=' . urlencode($search) : ''))); ?>"
+                                class="prev-next" title="<?php _e('الصفحة الأولى', 'crow-certificates'); ?>">
+                                ⏮ <?php _e('الأولى', 'crow-certificates'); ?>
+                            </a>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=crow-certificates-list&paged=' . ($paged - 1) . (!empty($search) ? '&s=' . urlencode($search) : ''))); ?>"
+                                class="prev-next" title="<?php _e('الصفحة السابقة', 'crow-certificates'); ?>">
+                                ← <?php _e('السابق', 'crow-certificates'); ?>
+                            </a>
+                        <?php endif; ?>
+
+                        <!-- Page Numbers -->
                         <?php
-                        for ($i = 1; $i <= $total_pages; $i++) {
-                            $url = admin_url('admin.php?page=crow-certificates-list&paged=' . $i);
+                        $start_page = max(1, $paged - 2);
+                        $end_page = min($total_pages, $paged + 2);
+
+                        if ($start_page > 1) {
+                            $url = admin_url('admin.php?page=crow-certificates-list&paged=1');
                             if (!empty($search)) {
                                 $url .= '&s=' . urlencode($search);
                             }
+                            echo '<a href="' . esc_url($url) . '">1</a>';
+                            if ($start_page > 2) {
+                                echo '<span>...</span>';
+                            }
+                        }
 
+                        for ($i = $start_page; $i <= $end_page; $i++) {
                             if ($i === $paged) {
                                 echo '<span class="current">' . $i . '</span>';
                             } else {
+                                $url = admin_url('admin.php?page=crow-certificates-list&paged=' . $i);
+                                if (!empty($search)) {
+                                    $url .= '&s=' . urlencode($search);
+                                }
                                 echo '<a href="' . esc_url($url) . '">' . $i . '</a>';
                             }
                         }
+
+                        if ($end_page < $total_pages) {
+                            if ($end_page < $total_pages - 1) {
+                                echo '<span>...</span>';
+                            }
+                            $url = admin_url('admin.php?page=crow-certificates-list&paged=' . $total_pages);
+                            if (!empty($search)) {
+                                $url .= '&s=' . urlencode($search);
+                            }
+                            echo '<a href="' . esc_url($url) . '">' . $total_pages . '</a>';
+                        }
                         ?>
+
+                        <!-- Next Button -->
+                        <?php if ($paged < $total_pages): ?>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=crow-certificates-list&paged=' . ($paged + 1) . (!empty($search) ? '&s=' . urlencode($search) : ''))); ?>"
+                                class="prev-next" title="<?php _e('الصفحة التالية', 'crow-certificates'); ?>">
+                                <?php _e('التالي', 'crow-certificates'); ?> →
+                            </a>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=crow-certificates-list&paged=' . $total_pages . (!empty($search) ? '&s=' . urlencode($search) : ''))); ?>"
+                                class="prev-next" title="<?php _e('الصفحة الأخيرة', 'crow-certificates'); ?>">
+                                <?php _e('الأخيرة', 'crow-certificates'); ?> ⏭
+                            </a>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
